@@ -192,7 +192,7 @@ public class ProductManagementController {
     @ResponseBody
     private Map<String, Object> modifyProduct(HttpServletRequest request) throws IOException {
         boolean statusChange = HttpServletRequestUtil.getBoolean(request,
-                "statusChange");
+                "productStatusChange");
         Map<String, Object> modelMap = new HashMap<String, Object>();
         //验证码判断
         if (!statusChange && !CodeUtil.checkVerifyCode(request)) {
@@ -217,12 +217,12 @@ public class ProductManagementController {
             modelMap.put("errMsg", e.toString());
             return modelMap;
         }
-        try{//从前端获取的表单String流转换成Product实体类
-            String productStr=HttpServletRequestUtil.getString(request,"productStr");
-            product=mapper.readValue(productStr,Product.class);
-        }catch (Exception e){
-            modelMap.put("success",false);
-            modelMap.put("errMsg",e.toString());
+        try {//从前端获取的表单String流转换成Product实体类
+            String productStr = HttpServletRequestUtil.getString(request, "productStr");
+            product = mapper.readValue(productStr, Product.class);
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.toString());
             return modelMap;
         }
         if (product != null) {
@@ -252,8 +252,7 @@ public class ProductManagementController {
         return modelMap;
     }
 
-    private Product compactProductCondition4Search(long shopId,
-                                                   long productCategoryId, String productName) {
+    private Product compactProductCondition4Search(long shopId, long productCategoryId, String productName) {
         Product productCondition = new Product();
         Shop shop = new Shop();
         shop.setShopId(shopId);

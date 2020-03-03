@@ -2,14 +2,17 @@ package com.xjh.o2o.web.shopadmin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xjh.o2o.dto.ImageHolder;
+import com.xjh.o2o.dto.PersonInfoExecution;
 import com.xjh.o2o.dto.ShopExecution;
 import com.xjh.o2o.entity.Area;
 import com.xjh.o2o.entity.PersonInfo;
 import com.xjh.o2o.entity.Shop;
 import com.xjh.o2o.entity.ShopCategory;
+import com.xjh.o2o.enums.PersonInfoStateEnum;
 import com.xjh.o2o.enums.ShopStateEnum;
 import com.xjh.o2o.exceptions.ShopOperationException;
 import com.xjh.o2o.service.AreaService;
+import com.xjh.o2o.service.PersonInfoService;
 import com.xjh.o2o.service.ShopCategoryService;
 import com.xjh.o2o.service.ShopService;
 import com.xjh.o2o.util.CodeUtil;
@@ -39,6 +42,8 @@ public class ShopManagementController {
     private ShopCategoryService shopCategoryService;
     @Autowired
     private AreaService areaService;
+    @Autowired
+    private PersonInfoService personInfoService;
 
     //只有已经登录的用户才能访问该网页
     @RequestMapping(value = "/getshopmanagementinfo", method = RequestMethod.GET)//获取店铺信息
@@ -68,22 +73,33 @@ public class ShopManagementController {
     @RequestMapping(value = "/getshoplist", method = RequestMethod.GET)//获取所有店铺
     @ResponseBody
     private Map<String, Object> getShopList(HttpServletRequest request) {
+        String cancel = request.getParameter("cancel");
         Map<String, Object> modelMap = new HashMap<String, Object>();
-        PersonInfo user = new PersonInfo();
-        user.setUserId(1L);
-        user.setName("test");
-        request.getSession().setAttribute("user", user);
+        PersonInfo user;
+        if (cancel != null) {
+            request.getSession().invalidate();
+        }
         user = (PersonInfo) request.getSession().getAttribute("user");
-        try {
-            Shop shopCondition = new Shop();
-            shopCondition.setOwner(user);
-            ShopExecution se = shopService.getShopList(shopCondition, 0, 100);
-            modelMap.put("shopList", se.getShopList());
-            modelMap.put("user", user);
-            modelMap.put("success", true);
-        } catch (Exception e) {
+        if (user != null) {
+            try {
+                Shop shopCondition = new Shop();
+                if (user.getUserId() != 2) {
+                    shopCondition.setOwner(user);
+                }
+                ShopExecution se = shopService.getShopList(shopCondition, 0, 100);
+                if (se.getState() == ShopStateEnum.INNER_ERROR.getState()) {
+                    modelMap.put("success", false);
+                } else {
+                    modelMap.put("shopList", se.getShopList());
+                    modelMap.put("user", user);
+                    modelMap.put("success", true);
+                }
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+        } else {
             modelMap.put("success", false);
-            modelMap.put("errMsg", e.getMessage());
         }
         return modelMap;
     }
@@ -202,8 +218,10 @@ public class ShopManagementController {
     @RequestMapping(value = "/modifyshop", method = RequestMethod.POST)//修改店铺信息
     @ResponseBody
     private Map<String, Object> modifyShop(HttpServletRequest request) {
+        boolean statusChange = HttpServletRequestUtil.getBoolean(request,
+                "shopStatusChange");
         Map<String, Object> modelMap = new HashMap<String, Object>();
-        if (!CodeUtil.checkVerifyCode(request)) {
+        if (!statusChange && !CodeUtil.checkVerifyCode(request)) {
             modelMap.put("success", false);
             modelMap.put("errMsg", "验证码错误");
             return modelMap;
@@ -231,7 +249,7 @@ public class ShopManagementController {
             ShopExecution se;
             try {
                 if (shopImg == null) {
-                    ImageHolder imageHolder=new ImageHolder(null,null);
+                    ImageHolder imageHolder = new ImageHolder(null, null);
                     se = shopService.modifyShop(shop, imageHolder);//传null会空指针异常
                 } else {
                     ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(), shopImg.getInputStream());
@@ -250,36 +268,125 @@ public class ShopManagementController {
                 modelMap.put("success", false);
                 modelMap.put("errMsg", e.getMessage());
             }
-            return modelMap;
         } else {
             modelMap.put("success", false);
             modelMap.put("errMsg", "请输入商铺id");
+        }
+        return modelMap;
+    }
+
+    /////////////////////////////////////////////////用户信息操作///////////////////////////////////////////////////////////
+    @RequestMapping(value = "/registerpersoninfo", method = RequestMethod.POST)//注册用户
+    @ResponseBody
+    private Map<String, Object> registerPersonInfo(HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        if (!CodeUtil.checkVerifyCode(request)) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "验证码错误");
             return modelMap;
         }
-
+        String personInfoStr = HttpServletRequestUtil.getString(request, "personInfoStr");
+        ObjectMapper mapper = new ObjectMapper();
+        PersonInfo personInfo = null;
+        try {
+            personInfo = mapper.readValue(personInfoStr, PersonInfo.class);
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.getMessage());
+            return modelMap;
+        }
+        if (personInfo != null) {
+            PersonInfoExecution se;
+            try {
+                se = personInfoService.addPersonInfo(personInfo);
+                if (se.getState() == PersonInfoStateEnum.EXIST.getState()) {
+                    modelMap.put("success", false);
+                    modelMap.put("exist", true);
+                } else if (se.getState() == PersonInfoStateEnum.SUCCESS.getState()) {
+                    modelMap.put("success", true);
+                    modelMap.put("exist", false);
+                }
+            } catch (RuntimeException e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+        }
+        return modelMap;
     }
-//	private static void inputStreamToFile(java.io.InputStream inputStream,File file) {
-//		OutputStream os=null;
-//		try {
-//			os=new FileOutputStream(file);
-//			int bytesRead=0;
-//			byte[] buffer=new byte[1024];
-//			while ((bytesRead=inputStream.read(buffer))!=-1) {
-//				os.write(buffer,0,bytesRead);
-//			}
-//		}catch(Exception e) {
-//			throw new RuntimeException("调用inputStreamToFile产生异常："+e.getMessage());
-//		}finally {
-//			try {
-//				if(os!=null) {
-//					os.close();
-//				}
-//				if(inputStream!=null) {
-//					inputStream.close();
-//				}
-//			}catch(IOException e) {
-//				throw new RuntimeException("inputStreamToFile关闭io产生异常："+e.getMessage());
-//			}
-//		}
-//	}
+
+    @RequestMapping(value = "/getpersoninfo", method = RequestMethod.POST)//登录
+    @ResponseBody
+    private Map<String, Object> login(HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        if (!CodeUtil.checkVerifyCode(request)) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "验证码错误");
+            return modelMap;
+        }
+        String loginStr = HttpServletRequestUtil.getString(request, "loginStr");//获取帐号密码json串
+        ObjectMapper mapper = new ObjectMapper();
+        PersonInfo personInfoCondition = null;
+        try {
+            personInfoCondition = mapper.readValue(loginStr, PersonInfo.class);//转换为PersonInfo类型
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.getMessage());
+            return modelMap;
+        }
+        if (personInfoCondition != null) {
+            PersonInfoExecution se;
+            try {
+                se = personInfoService.getPersonInfo(personInfoCondition);//根据帐号密码查询用户
+                if (se.getState() == PersonInfoStateEnum.INNER_ERROR.getState()) {//用户不存在
+                    modelMap.put("success", false);
+                    modelMap.put("errMsg", "帐号密码错误");
+                } else {
+                    request.getSession().setAttribute("user", se.getPersonInfo());
+                    modelMap.put("success", true);
+                }
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+        }
+        return modelMap;
+    }
+
+    @RequestMapping(value = "/modifypersoninfo", method = RequestMethod.POST)//修改用户信息
+    @ResponseBody
+    private Map<String, Object> modifyPersonInfo(HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        if (!CodeUtil.checkVerifyCode(request)) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "验证码错误");
+            return modelMap;
+        }
+        String personInfoStr = HttpServletRequestUtil.getString(request, "personInfoStr");
+        ObjectMapper mapper = new ObjectMapper();
+        PersonInfo personInfo = null;
+        try {
+            personInfo = mapper.readValue(personInfoStr, PersonInfo.class);
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.getMessage());
+            return modelMap;
+        }
+        if (personInfo != null) {
+            PersonInfoExecution se;
+            try {
+                se = personInfoService.modifyPersonInfo(personInfo);
+                if (se.getState() == PersonInfoStateEnum.EXIST.getState()) {
+                    modelMap.put("success", false);
+                    modelMap.put("exist", true);
+                } else if (se.getState() == PersonInfoStateEnum.SUCCESS.getState()) {
+                    modelMap.put("success", true);
+                    modelMap.put("exist", false);
+                }
+            } catch (RuntimeException e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+        }
+        return modelMap;
+    }
 }

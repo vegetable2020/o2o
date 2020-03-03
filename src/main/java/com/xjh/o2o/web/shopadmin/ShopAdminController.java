@@ -31,4 +31,12 @@ public class ShopAdminController {
 	public String productOperation() {
 		return "shop/productoperation";
 	}
+	@RequestMapping(value = "/login")
+	public String login() {
+		return "shop/login";
+	}
+	@RequestMapping(value = "/personinfooperation")
+	public String logon() {
+		return "shop/personinfooperation";
+	}
 }

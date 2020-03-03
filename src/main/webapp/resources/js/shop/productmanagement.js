@@ -66,7 +66,7 @@ $(function () {
                 type: 'POST',
                 data: {
                     productStr: JSON.stringify(product),
-                    statusChange: true//标识符，跳过验证码验证直接修改商品状态码
+                    productStatusChange: true//标识符，跳过验证码验证直接修改商品状态码
                 },
                 dataType: 'json',
                 success: function (data) {

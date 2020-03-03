@@ -67,6 +67,10 @@ $(function () {
                         + '<div class="item-media">' + '<img src="..\\resources\\image'
                         + item.imgAddr + '" width="44">' + '</div>'
                         + '<div class="item-inner">'
+                        + '<div class="item-normal-price">原价：' + item.normalPrice
+                        + '</div>'
+                        + '<div class="item-promotion-price">现价：' + item.promotionPrice
+                        + '</div>'
                         + '<div class="item-subtitle">' + item.productDesc
                         + '</div>' + '</div>' + '</li>' + '</ul>'
                         + '</div>' + '</div>' + '<div class="card-footer">'
