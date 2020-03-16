@@ -2,9 +2,8 @@ package com.xjh.o2o.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class HttpServletRequestUtil {
+public class HttpServletRequestUtil {//类型转换
 	public static int getInt(HttpServletRequest request, String name) {
-
 		try {
 			return Integer.decode(request.getParameter(name));
 		} catch (Exception e) {

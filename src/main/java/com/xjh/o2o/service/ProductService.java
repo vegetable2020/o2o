@@ -43,4 +43,5 @@ public interface ProductService {
      */
     ProductExecution modifyProduct(Product product, ImageHolder thumbnail, List<ImageHolder> productImgList) throws ProductOperationException;
 
+    ProductExecution deleteProduct(long productId, long shopId)throws ProductOperationException;
 }

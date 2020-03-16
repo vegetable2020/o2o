@@ -30,19 +30,22 @@ $(function () {
                         + '<div class="col-40">'
                         + item.priority
                         + '</div>'
-                        + '<div class="col-20">'
+                        + '<div class="col-30">'
                         + '<a href="#" class="edit" data-id="'
                         + item.productId
                         + '" data-status="'
                         + item.enableStatus
                         + '">编辑</a>'
-                        + '<a href="#" class="delete" data-id="'
+                        + '<a href="#" class="enable-status" data-id="'
                         + item.productId
                         + '" data-status="'
                         + contraryStatus
                         + '">'
-                        + textOp
+                        + textOp//显示上架或者下架
                         + '</a>'
+                        +'<a href="#" class="delete" data-id="'
+                        + item.productId
+                        + '">删除</a>'
                         + '<a href="#" class="preview" data-id="'
                         + item.productId
                         + '" data-status="'
@@ -80,6 +83,27 @@ $(function () {
             });
         });
     }
+    function deleteProduct(id) {
+        var productId = id;
+        $.confirm('确定么?', function () {
+            $.ajax({
+                url: '/o2o/shopadmin/removeproduct',
+                type: 'POST',
+                data: {
+                    productId: productId
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success) {
+                        $.toast('删除成功！');
+                        getList();
+                    } else {
+                        $.toast('删除失败！');
+                    }
+                }
+            });
+        });
+    }
 
     $('.product-wrap')
         .on('click', 'a', function (e) {
@@ -88,11 +112,13 @@ $(function () {
                 //进入店铺信息编辑
                 window.location.href = '/o2o/shopadmin/productoperation?productId='
                     + e.currentTarget.dataset.id;
-            } else if (target.hasClass('delete')) {
+            } else if (target.hasClass('enable-status')) {
                 //商品上/下架功能
                 changeItemStatus(e.currentTarget.dataset.id,
                     e.currentTarget.dataset.status);
-            } else if (target.hasClass('preview')) {
+            }else if(target.hasClass('delete')){
+                deleteProduct(e.currentTarget.dataset.id);
+            }else if (target.hasClass('preview')) {
                 //商品预览
                 window.location.href = '/o2o/frontend/productdetail?productId='
                     + e.currentTarget.dataset.id;

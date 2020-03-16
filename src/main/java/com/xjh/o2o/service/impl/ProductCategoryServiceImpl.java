@@ -48,7 +48,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ProductCategoryExecution deleteProductCategory(long productCategoryId, long shopId) throws ProductCategoryOperationException {
-        //接触tb_product里的商品与该productcategoryId的关联
+        //解除tb_product里的商品与该productcategoryId的关联
         try{
             int effectedNum=productDao.updateProductCategoryToNull(productCategoryId);
             if(effectedNum<0){

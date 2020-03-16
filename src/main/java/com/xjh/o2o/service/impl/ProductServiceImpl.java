@@ -110,6 +110,24 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ProductExecution deleteProduct(long productId, long shopId) throws ProductOperationException {
+        //删除该product
+        try {
+            Product tempProduct=productDao.queryProductByProductId(productId);
+            ImageUtil.deleteFileOrPath(tempProduct.getImgAddr());//删除缩略图
+            deleteProductImgs(productId);//删除详情图
+            int effectedNum = productDao.deleteProduct(productId, shopId);
+            if (effectedNum <= 0) {
+                throw new ProductOperationException("删除商品失败");
+            } else {
+                return new ProductExecution(ProductStateEnum.SUCCESS);
+            }
+        } catch (Exception e) {
+            throw new ProductOperationException("deleteProduct error:" + e.getMessage());
+        }
+    }
+
     private void addProductImgs(Product product, List<ImageHolder> productImgHolderList) {
         String dest = PathUtil.getShopImagePath(product.getShop().getShopId());
 //        List<String> imgAddrList = ImageUtil.generateNormalImgs(productImgHolderList, dest);
@@ -145,6 +163,7 @@ public class ProductServiceImpl implements ProductService {
         //删掉数据库内详情图数据
         productImgDao.deleteProductImgByProductId(productId);
     }
+
 
     private void addThumbnail(Product product, ImageHolder thumbnail) {
         String dest = PathUtil.getShopImagePath(product.getShop().getShopId());

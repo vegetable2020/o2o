@@ -252,6 +252,36 @@ public class ProductManagementController {
         return modelMap;
     }
 
+    @RequestMapping(value = "/removeproduct", method = RequestMethod.POST)
+    @ResponseBody
+    private Map<String, Object> removeProduct(Long productId, HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        if (productId != null && productId > 0) {
+            try {
+                Shop currentShop = (Shop) request.getSession().getAttribute(
+                        "currentShop");
+                ProductExecution pe = productService
+                        .deleteProduct(productId,
+                                currentShop.getShopId());
+                if (pe.getState() == ProductStateEnum.SUCCESS
+                        .getState()) {
+                    modelMap.put("success", true);
+                } else {
+                    modelMap.put("success", false);
+                    modelMap.put("errMsg", pe.getStateInfo());
+                }
+            } catch (RuntimeException e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.toString());
+                return modelMap;
+            }
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "请至少选择一个商品");
+        }
+        return modelMap;
+    }
+
     private Product compactProductCondition4Search(long shopId, long productCategoryId, String productName) {
         Product productCondition = new Product();
         Shop shop = new Shop();

@@ -55,4 +55,7 @@ public interface ProductDao {
      * @return
      */
     int updateProductCategoryToNull(long productCategoryId);
+
+
+    int deleteProduct(@Param("productId") long productId,@Param("shopId")long shopId);
 }
