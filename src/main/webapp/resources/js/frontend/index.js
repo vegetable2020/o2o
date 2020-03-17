@@ -7,7 +7,8 @@ $(function () {
             var swiperHtml = '';
             headLineList.map(function (item, index) {
                 swiperHtml += ''
-                    + '<div class="swiper-slide img-wrap">'
+                    + '<div class="swiper-slide img-wrap" id= "img-slide" data-link=' + item.lineLink + '>'
+                    + '<a href="#">'
                     + '<img class="banner-img" src="..\\resources\\image' + item.lineImg + '" alt="' + item.lineName + '">'
                     + '</div>';
             });
@@ -45,6 +46,11 @@ $(function () {
     $('.row').on('click', '.shop-classify', function (e) {
         var shopCategoryId = e.currentTarget.dataset.category;
         var newUrl = '/o2o/frontend/shoplist?parentId=' + shopCategoryId;
+        window.location.href = newUrl;
+    });
+    $('.swiper-wrapper').on('click','.img-wrap' ,function (e) {
+        var lineLink = e.currentTarget.dataset.link;
+        var newUrl = '/o2o/frontend/shopdetail?shopId=' + lineLink;
         window.location.href = newUrl;
     });
 });
