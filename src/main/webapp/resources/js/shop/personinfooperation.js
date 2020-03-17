@@ -7,7 +7,6 @@ $(function () {
     var registerPersonInfoUrl = '/o2o/shopadmin/registerpersoninfo';
     var personInfoUrl = "/o2o/shopadmin/getpersoninfobyid?userId=" + userId;
     var editPersonInfoUrl = '/o2o/shopadmin/modifypersoninfo';
-    var modifySuccessUrl='/o2o/shopadmin/shoplist';
     if (isEdit) {
         getPersonInfo();
     }
@@ -48,11 +47,7 @@ $(function () {
                 cache: false,
                 success: function (data) {
                     if (data.success) {
-                        if(isEdit){
                             $.toast('提交成功！');
-                        }else{
-                            window.location.href=modifySuccessUrl;
-                        }
                     } else if (data.exist) {
                         $.toast('电子邮箱已被使用！');
                     } else {
