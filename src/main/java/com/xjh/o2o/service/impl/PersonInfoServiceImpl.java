@@ -55,7 +55,8 @@ public class PersonInfoServiceImpl implements PersonInfoService {
         if (personInfo != null && personInfo.getEmail() != null && personInfo.getPassword() != null) {
             PersonInfo personInfoCondition = new PersonInfo();
             personInfoCondition.setEmail(personInfo.getEmail());
-            if (personInfoDao.queryPersonInfo(personInfoCondition) != null) {
+            personInfoCondition = personInfoDao.queryPersonInfo(personInfoCondition);
+            if (personInfoCondition != null && personInfoCondition.getUserId() != personInfo.getUserId()) {
                 return new PersonInfoExecution(PersonInfoStateEnum.EXIST);
             } else {
                 personInfo.setLastEditTime(new Date());

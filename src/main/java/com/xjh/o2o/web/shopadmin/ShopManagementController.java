@@ -314,6 +314,27 @@ public class ShopManagementController {
         return modelMap;
     }
 
+    @RequestMapping(value = "/getpersoninfobyid", method = RequestMethod.GET)//根据id查询用户
+    @ResponseBody
+    private Map<String, Object> getPersonInfoById(HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        Long userId = HttpServletRequestUtil.getLong(request, "userId");
+        if (userId > -1) {
+            try {
+                PersonInfo personInfo = personInfoService.getPersonInfoByUserId(userId);
+                modelMap.put("personInfo", personInfo);
+                modelMap.put("success", true);
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.toString());
+            }
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "empty userId");
+        }
+        return modelMap;
+    }
+
     @RequestMapping(value = "/getpersoninfo", method = RequestMethod.POST)//登录
     @ResponseBody
     private Map<String, Object> login(HttpServletRequest request) {

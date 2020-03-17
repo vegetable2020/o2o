@@ -7,6 +7,8 @@ $(function(){
 	}
 	var loginUrl='/o2o/shopadmin/login';
 	var superAdministrator=false;
+	var userId;
+
 	getList();
 	function getList(e){
 		$.ajax({
@@ -15,7 +17,8 @@ $(function(){
 			dateType:"json",
 			success:function(data){
 				if(data.success){
-					if(data.user.userId==2){
+					userId=data.user.userId;
+					if(userId==2){
 						superAdministrator=true;
 					}else{
 						superAdministrator=false;
@@ -110,5 +113,10 @@ $(function(){
     $('.shop-wrap').on('click', '.row-shop .shop-state', function (e) {
         changeItemStatus(e.currentTarget.dataset.id,
             e.currentTarget.dataset.status);
-    })
+    });
+
+	$('.row').on('click', '.button-user-info', function (e) {
+		var newUrl = '/o2o/shopadmin/personinfooperation?userId=' + userId;
+		window.location.href = newUrl;
+	});
 })

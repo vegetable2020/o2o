@@ -9,29 +9,15 @@ $(function () {
     var editPersonInfoUrl = '/o2o/shopadmin/modifypersoninfo';
     var modifySuccessUrl='/o2o/shopadmin/shoplist';
     if (isEdit) {
-        getPersonInfo(userId);
+        getPersonInfo();
     }
 
-    function getPersonInfo(userId) {
+    function getPersonInfo() {
         $.getJSON(personInfoUrl, function (data) {
             if (data.success) {
-                var shop = data.shop;
-                $('#shop-name').val(shop.shopName);
-                $('#shop-addr').val(shop.shopAddr);
-                $('#shop-phone').val(shop.phone);
-                $('#shop-desc').val(shop.shopDesc);
-                var shopCategory = '<option data-id="'
-                    + shop.shopCategory.shopCategoryId + '"selected>'
-                    + shop.shopCategory.shopCategoryName + '</option>';
-                var tempAreaHtml = '';
-                data.areaList.map(function (item, index) {
-                    tempAreaHtml += '<option data-id="' + item.areaId + '">'
-                        + item.areaName + '</option>';
-                });
-                $('#shop-category').html(shopCategory);
-                $('#shop-category').attr('disable', 'disable');
-                $('#area').html(tempAreaHtml);
-                $("#area option[data-id='" + shop.area.areaId + "']").attr("selected", "selected");
+                var user = data.personInfo;
+                $('#name').val(user.name);
+                $('#email').val(user.email);
             }
         });
     }
@@ -40,7 +26,7 @@ $(function () {
         function () {
             var personInfo = {};
             if (isEdit) {
-                personInfo.personInfoId = userId;
+                personInfo.userId = userId;
             }
             personInfo.name = $('#name').val();
             personInfo.email = $('#email').val();
@@ -62,8 +48,11 @@ $(function () {
                 cache: false,
                 success: function (data) {
                     if (data.success) {
-                        $.toast('提交成功！');
-                        window.location.href=modifySuccessUrl;
+                        if(isEdit){
+                            $.toast('提交成功！');
+                        }else{
+                            window.location.href=modifySuccessUrl;
+                        }
                     } else if (data.exist) {
                         $.toast('电子邮箱已被使用！');
                     } else {
