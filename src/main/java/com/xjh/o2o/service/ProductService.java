@@ -18,7 +18,7 @@ public interface ProductService {
      */
     ProductExecution getProductList(Product productCondition, int pageIndex, int pageSize);
 
-    Product getProductById(long productId);
+    ProductExecution getProductById(long productId);
 
     /**
      * 添加商品

@@ -72,7 +72,7 @@ public class ProductManagementController {
     private Map<String, Object> getProductById(@RequestParam Long productId) {
         Map<String, Object> modelMap = new HashMap<String, Object>();
         if (productId > -1) {
-            Product product = productService.getProductById(productId);
+            Product product = productService.getProductById(productId).getProduct();
             //获取商铺的商品类别列表
             List<ProductCategory> productCategoryList = productCategoryService
                     .getProductCategoryList(product.getShop().getShopId());

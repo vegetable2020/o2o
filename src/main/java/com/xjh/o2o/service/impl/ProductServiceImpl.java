@@ -39,8 +39,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProductById(long productId) {
-        return productDao.queryProductByProductId(productId);
+    public ProductExecution getProductById(long productId) {
+        List<ProductImg> productImgList=productImgDao.queryProductImgList(productId);
+        Product product=productDao.queryProductByProductId(productId);
+        ProductExecution pe = new ProductExecution();
+        pe.setProduct(product);
+        pe.setProductImgs(productImgList);
+        return pe;
     }
 
     @Override

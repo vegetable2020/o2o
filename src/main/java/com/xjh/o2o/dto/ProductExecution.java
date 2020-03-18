@@ -1,6 +1,7 @@
 package com.xjh.o2o.dto;
 
 import com.xjh.o2o.entity.Product;
+import com.xjh.o2o.entity.ProductImg;
 import com.xjh.o2o.enums.ProductStateEnum;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class ProductExecution {
 
 	// 获取的product列表(查询商品列表的时候用)
 	private List<Product> productList;
+
+	private List<ProductImg> productImgs;
 
 	public ProductExecution() {
 	}
@@ -43,6 +46,14 @@ public class ProductExecution {
 		this.state = stateEnum.getState();
 		this.stateInfo = stateEnum.getStateInfo();
 		this.productList = productList;
+	}
+
+	public List<ProductImg> getProductImgs() {
+		return productImgs;
+	}
+
+	public void setProductImgs(List<ProductImg> productImgs) {
+		this.productImgs = productImgs;
 	}
 
 	public int getState() {

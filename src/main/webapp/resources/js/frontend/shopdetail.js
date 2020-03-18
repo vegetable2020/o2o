@@ -25,10 +25,10 @@ $(function () {
                         $('#shop-update-time').html(
                             new Date(shop.lastEditTime)
                                 .Format("yyyy-MM-dd"));
-                        $('#shop-name').html(shop.shopName);
-                        $('#shop-desc').html(shop.shopDesc);
-                        $('#shop-addr').html(shop.shopAddr);
-                        $('#shop-phone').html(shop.phone);
+                        $('#shop-name').html("商铺名称："+shop.shopName);
+                        $('#shop-desc').html("商铺描述："+shop.shopDesc);
+                        $('#shop-addr').html("商铺地址："+shop.shopAddr);
+                        $('#shop-phone').html("联系电话："+shop.phone);
 
                         var productCategoryList = data.productCategoryList;
                         var html = '';
@@ -125,10 +125,7 @@ $(function () {
     });
 	//进入商品详情页
     $('.list-div')
-        .on(
-            'click',
-            '.card',
-            function (e) {
+        .on('click', '.card', function (e) {
                 var productId = e.currentTarget.dataset.productId;
                 window.location.href = '/o2o/frontend/productdetail?productId='
                     + productId;

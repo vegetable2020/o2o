@@ -4,12 +4,15 @@
     padding-left: .5rem;
     background-color: #f7f7f8;
 }
+
 .infinite-scroll-preloader {
     margin-top: -5px;
 }
+
 .shopdetail-button-div {
     margin: 0 .3rem;
 }
+
 .shopdetail-button-div > .button {
     width: 30%;
     height: 1.5rem;
@@ -18,10 +21,22 @@
     margin: 1%;
     overflow: hidden;
 }
+
 .list-div > .card {
     width: 31%;
     cursor: pointer;
     display: inline-block;
     margin: 1%;
     overflow: hidden;
+}
+
+.card-header {
+    height: 50%;
+    width: 100%;
+    padding-bottom: 0.4rem;
+}
+
+.card-header > .card-cover {
+    width: 70%;
+    align-content: center;
 }
