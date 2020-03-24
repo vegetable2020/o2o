@@ -113,8 +113,10 @@ public class ShopManagementController {
             try {
                 Shop shop = shopService.getByShopId(shopId);
                 List<Area> areaList = areaService.getAreaList();
+                List<ShopCategory> shopCategoryList = shopCategoryService.getShopCategoryList(new ShopCategory());
                 modelMap.put("shop", shop);
                 modelMap.put("areaList", areaList);
+                modelMap.put("shopCategoryList", shopCategoryList);
                 modelMap.put("success", true);
             } catch (Exception e) {
                 modelMap.put("success", false);
@@ -131,7 +133,7 @@ public class ShopManagementController {
     @ResponseBody
     private Map<String, Object> getShopInitInfo() {
         Map<String, Object> modelMap = new HashMap<String, Object>();
-        List<ShopCategory> shopCategoryList = new ArrayList<ShopCategory>();
+        List<ShopCategory> shopCategoryList ;
         List<Area> areaList = new ArrayList<Area>();
         try {
             shopCategoryList = shopCategoryService.getShopCategoryList(new ShopCategory());
